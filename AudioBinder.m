@@ -149,12 +149,19 @@ stringForOSStatus(OSStatus err)
 {
     FSRef dirFSRef;
     OSStatus status;
+    NSString *parentDir;
     AudioStreamBasicDescription outputFormat;
     
     // open out file
-    status = FSPathMakeRef((UInt8 *)
-        [[_outFileName stringByDeletingLastPathComponent] UTF8String], 
-                           &dirFSRef, NULL);
+    parentDir = [_outFileName stringByDeletingLastPathComponent];
+    if ([parentDir isEqualToString:@""]) {
+        status = FSPathMakeRef((UInt8 *)
+                               [@"." UTF8String], &dirFSRef, NULL);
+    } else {
+        status = FSPathMakeRef((UInt8 *)
+                               [parentDir UTF8String], 
+                               &dirFSRef, NULL);
+    }
     if (status != noErr)
     {
         ABLog(@"FSPathMakeRef failed for %@: %@", 
